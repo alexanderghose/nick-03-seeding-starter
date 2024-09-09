@@ -8,6 +8,27 @@ const movieData = [
 ]
 // ! This is a program to put data into the database.
 async function seed() {
+  // TODO we connected to the database.
+  // ! This has mongoose connect to Mongodb. This string should have your DB name at the end.
+  await mongoose.connect('mongodb://127.0.0.1:27017/moviesdb')
+  console.log('Connected to the database! 🔥')
+
+  // ! If you want to remove all the existing data in the db
+  await mongoose.connection.db.dropDatabase()
+  console.log('Remove existing data.')
+
+  // TODO describe what the data looks like (making a model) ✅
+  // ! We made a movie model.
+
+  // TODO put the data into the database
+  const movies = await Movies.create(movieData)
+  console.log('Here are the movies:')
+  console.log(movies)
+
+  // ! Final thing: disconnect from mongodb. Good practice to close
+  // ! the session when you're finished.
+  console.log('Disconnecting 🤖..')
+  await mongoose.disconnect()
 }
 
 seed()
