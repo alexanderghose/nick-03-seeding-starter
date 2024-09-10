@@ -1,4 +1,9 @@
 import express from 'express'
+import mongoose from "mongoose"
+// ! Movies is our compiled model
+// ! We use it to run mongoose methods
+// ! like Movies.create() or Movies.find()
+import Movies from './models/movies'
 
 const app = express() 
 
@@ -11,29 +16,38 @@ const movieData = [
 const router = express.Router()
 
 // ! getting my movies
-router.route('/api/movies').get((req, res) => {
-  res.send(movieData)
+router.route('/api/movies').get(async (req, res) => {
+  // ! Mongoose method .find() lets you grab ALL the movies from the db
+  let obtainedMovies = await Movies.find()
+  console.log("obtained these from db:", obtainedMovies)
+
+  res.send(obtainedMovies)
 })
 
 // ! Getting an individual movie
-router.route('/api/movies/:movieId').get((req, res) => {
+router.route('/api/movies/:movieId').get(async (req, res) => {
   // ? req.params.movieId gives us the param named movieId
-  const movieId = Number(req.params.movieId) // ! Get the id you're asking for, as a number
+  const movieId = req.params.movieId // ! Get the id you're asking for, as a number
   console.log(movieId)
-  const foundMovie = movieData.find((movie) => { // ! finding the movie that matches the movieId we're asking for.
-    return movieId === movie.movieId // ! Returns true if the movieId matches the movieId we're asking for.
-  })
-  res.send(foundMovie)
+
+  // A mongoose model's .findById() method lets you look up objects by id
+  // ? movieId = the mongoDB ID
+  const obtainedMovie = await Movies.findById(movieId)
+  console.log("movie obtained", obtainedMovie)
+
+  res.send(obtainedMovie) // send movie obj to frontend as JSON
 })
 
 // ! Posting a movie
-router.route('/api/movies').post((req, res) => {
+router.route('/api/movies').post(async (req, res) => {
   // ? If I sent a movie, how do I get what I sent in here?
-  console.log('POSTING!', req.body)
-  const movie = req.body
-  movie.movieId = movieData.length + 1 // ! A hack to add an id to a movie for now.
-  movieData.push(movie) // ! Adds movie to the array
-  res.send(movieData)
+  console.log('USER HAS SENT US:', req.body)
+  const incomingMovie = req.body
+
+  let savedMovie = await Movies.create(incomingMovie) // save to DB
+  console.log("Just added", savedMovie)
+
+  res.send(savedMovie) // send over the saved movie to frontend as JSON
 })
 
 // ! To get POSTing to work, we need to add this line:
@@ -41,6 +55,13 @@ app.use(express.json())
 
 app.use(router)
 
-app.listen(8000, () => {
-  console.log('Express API is running on http://localhost:8000')
-})
+async function start() {
+  await mongoose.connect("mongodb://127.0.0.1:27017/moviesdb")
+  console.log("Connected to the database!")
+
+  app.listen(8000, () => {
+    console.log('Express API is running on http://localhost:8000')
+  })
+}
+
+start()
