@@ -4,6 +4,7 @@ import mongoose from "mongoose"
 // ! We use it to run mongoose methods
 // ! like Movies.create() or Movies.find()
 import Movies from './models/movies'
+import { indexCtrl } from './controllers/movieController'
 
 const app = express() 
 
@@ -16,13 +17,7 @@ const movieData = [
 const router = express.Router()
 
 // ! getting my movies
-router.route('/api/movies').get(async (req, res) => {
-  // ! Mongoose method .find() lets you grab ALL the movies from the db
-  let obtainedMovies = await Movies.find()
-  console.log("obtained these from db:", obtainedMovies)
-
-  res.send(obtainedMovies)
-})
+router.route('/api/movies').get(indexCtrl)
 
 // ! Getting an individual movie
 router.route('/api/movies/:movieId').get(async (req, res) => {

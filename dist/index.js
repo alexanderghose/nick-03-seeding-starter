@@ -18,6 +18,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 // ! We use it to run mongoose methods
 // ! like Movies.create() or Movies.find()
 const movies_1 = __importDefault(require("./models/movies"));
+const movieController_1 = require("./controllers/movieController");
 const app = (0, express_1.default)();
 const movieData = [
     { name: 'Diehard', movieId: 1 },
@@ -26,12 +27,7 @@ const movieData = [
 ];
 const router = express_1.default.Router();
 // ! getting my movies
-router.route('/api/movies').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // ! Mongoose method .find() lets you grab ALL the movies from the db
-    let obtainedMovies = yield movies_1.default.find();
-    console.log("obtained these from db:", obtainedMovies);
-    res.send(obtainedMovies);
-}));
+router.route('/api/movies').get(movieController_1.indexCtrl);
 // ! Getting an individual movie
 router.route('/api/movies/:movieId').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
