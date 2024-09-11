@@ -34,14 +34,25 @@ router.route('/api/movies').get((req, res) => __awaiter(void 0, void 0, void 0, 
 }));
 // ! Getting an individual movie
 router.route('/api/movies/:movieId').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // ? req.params.movieId gives us the param named movieId
-    const movieId = req.params.movieId; // ! Get the id you're asking for, as a number
-    console.log(movieId);
-    // A mongoose model's .findById() method lets you look up objects by id
-    // ? movieId = the mongoDB ID
-    const obtainedMovie = yield movies_1.default.findById(movieId);
-    console.log("movie obtained", obtainedMovie);
-    res.send(obtainedMovie); // send movie obj to frontend as JSON
+    try {
+        const movieId = req.params.movieId; // ! Get the id you're asking for, as a number
+        console.log(movieId);
+        const obtainedMovie = yield movies_1.default.findById(movieId);
+        console.log("movie obtained", obtainedMovie);
+        res.send(obtainedMovie); // send movie obj to frontend as JSON
+        // ! the catch part "catches" the error that was thrown.
+        // ! we can handle errors in this catch block
+        // ? e is a variable that is filled in by nodeJS, containing details abt error
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            console.log(e.message);
+        }
+        else {
+            console.log(e);
+        }
+        res.send({ message: "Movie not found. Did you provide a valid movieId?" });
+    }
 }));
 // ! Posting a movie
 router.route('/api/movies').post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
